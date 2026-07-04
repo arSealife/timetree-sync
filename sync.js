@@ -1,4 +1,4 @@
-// sync.js — Supabase → TimeTree (GitHub Actions)
+// sync.js — Supabase → TimeTree (GitHub Actions) 
 const TT='https://timetreeapp.com/api/v1', UA='web/2.1.0/en', TZ='America/Cancun', MARK='[SL:';
 const {TT_EMAIL,TT_PASSWORD,TT_CALENDAR_ID,SUPABASE_URL,SUPABASE_KEY}=process.env;
 
