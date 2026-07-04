@@ -1,4 +1,4 @@
-name: timetree-sync
+name: .github/workflows/sync.yml
 on:
   schedule:
     - cron: '*/15 * * * *'
