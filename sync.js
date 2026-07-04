@@ -7,8 +7,12 @@ async function login(){
   if(!r.ok)throw new Error('login '+await r.text());
   const m=(r.headers.get('set-cookie')||'').match(/_session_id=([^;]+)/);
   if(!m)throw new Error('sin session_id');
-  const j=await r.json();
-  return {sid:m[1], csrf:j.session_key, uid:j.user&&j.user.id};
+  const sid=m[1];const j=await r.json();const uid=j.user&&j.user.id;
+  // csrf desde el HTML de la app
+  const h=await fetch('https://timetreeapp.com/',{headers:{'Cookie':`_session_id=${sid}`,'User-Agent':'Mozilla/5.0'}});
+  const html=await h.text();
+  const cm=html.match(/name="csrf-token"\s+content="([^"]+)"/)||html.match(/content="([^"]+)"\s+name="csrf-token"/);
+  return {sid, csrf:cm?cm[1]:null, uid};
 }
 const H=(s,csrf)=>{const h={'Content-Type':'application/json','X-Timetreea':UA,'User-Agent':'Mozilla/5.0','Cookie':`_session_id=${s}`,'Origin':'https://timetreeapp.com'};if(csrf)h['X-CSRF-Token']=csrf;return h;};
 
