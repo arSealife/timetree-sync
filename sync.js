@@ -35,10 +35,11 @@ function build(r,uid){
   const now=Date.now();
   const res=(await sb.json()).filter(r=>!r.pre_reserva||(r.pre_reserva_expires&&new Date(r.pre_reserva_expires).getTime()>now));
   const {sid,csrf,uid}=await login();
+  console.log('csrf:',csrf?csrf.slice(0,10)+'...':'NULL','uid:',uid);
   const ev=await getEvents(sid,TT_CALENDAR_ID,csrf);
   const ex={};for(const e of ev){if(e.deactivated_at)continue;const m=(e.note||'').match(/\[SL:([0-9a-f-]+)\]/);if(m)ex[m[1]]=e;}
   let c=0,dl=0;const err=[];
-  for(const r of res){if(ex[r.id])continue;const x=await create(sid,TT_CALENDAR_ID,build(r,uid),csrf);x.ok?c++:err.push(r.id+' '+await x.text());}
+  for(const r of res){if(ex[r.id])continue;const x=await create(sid,TT_CALENDAR_ID,build(r,uid),csrf);if(x.ok){c++;}else{console.log('CREATE FAIL',x.status,await x.text());break;}}
   const act=new Set(res.map(r=>r.id));
   for(const[id,e]of Object.entries(ex)){if(act.has(id))continue;const x=await del(sid,TT_CALENDAR_ID,e.id||e.uuid,csrf);x.ok?dl++:err.push('del'+id);}
   console.log(JSON.stringify({created:c,deleted:dl,errors:err}));
